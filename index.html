@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>График потребления воды</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>График потребления воды</h1>
+            <div id="no-data-message" class="no-data">
+                <p>Загрузите файл с данными для построения графика</p>
+                <p id="ios-help" style="display: none; color: #ff6b6b; margin-top: 10px;"></p>
+            </div>
+        </header>
+        
+        <div class="stats" id="stats-container" style="display: none;">
+            <!-- Статистика будет заполнена скриптом -->
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="waterChart"></canvas>
+        </div>
+        
+        <div class="controls">
+            <div class="period-navigation">
+                <button class="nav-btn" id="prev-period" disabled>←</button>
+                <div class="period-display" id="period-display">...</div>
+                <button class="nav-btn" id="next-period" disabled>→</button>
+            </div>
+            
+            <div class="interval-selector">
+                <label>Интервал:</label>
+                <div>
+                    <button class="interval-btn active" data-days="7" disabled>7 дней</button>
+                    <button class="interval-btn" data-days="30" disabled>30 дней</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="file-upload-container">
+            <label for="data-file" class="file-input-label">📁 Загрузить файл данных</label>
+            <input type="file" id="data-file" class="file-input" accept=".txt">
+            <div class="current-file" id="current-file-name">Файл не выбран</div>
+        </div>
+        
+        <footer>
+            <!-- Футер можно заполнить по необходимости -->
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
