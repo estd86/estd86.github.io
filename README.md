@@ -1,4 +1,4 @@
-<body>
+
     <div class="container">
         <h1>График потребления воды</h1>
         <button onclick="loadData()">Загрузить тестовые данные</button>
@@ -22,4 +22,3 @@
             });
         }
     </script>
-</body>
