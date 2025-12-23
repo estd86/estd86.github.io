@@ -1,16 +1,3 @@
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>График воды</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: -apple-system; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        button { padding: 10px; margin: 5px; }
-        canvas { width: 100%; height: 300px; }
-    </style>
-</head>
 <body>
     <div class="container">
         <h1>График потребления воды</h1>
