@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>График потребления воды</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 105, 148, 0.1);
+            padding: 25px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e1f5fe;
+        }
+        
+        h1 {
+            color: #024b7b;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8fdff;
+            border-radius: 10px;
+            border: 1px solid #e1f5fe;
+        }
+        
+        .period-navigation {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e3f2fd;
+            border: 2px solid #81d4fa;
+            cursor: pointer;
+            font-size: 18px;
+            color: #01579b;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-btn:hover {
+            background-color: #b3e5fc;
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #e0e0e0;
+            border-color: #bdbdbd;
+        }
+        
+        .period-display {
+            font-weight: 600;
+            color: #024b7b;
+            font-size: 18px;
+            min-width: 300px;
+            text-align: center;
+        }
+        
+        .interval-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .interval-selector label {
+            font-weight: 600;
+            color: #024b7b;
+        }
+        
+        .interval-btn {
+            padding: 10px 20px;
+            background-color: #e3f2fd;
+            border: 2px solid #81d4fa;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #01579b;
+            transition: all 0.3s ease;
+        }
+        
+        .interval-btn:hover {
+            background-color: #b3e5fc;
+        }
+        
+        .interval-btn.active {
+            background-color: #024b7b;
+            color: white;
+            border-color: #024b7b;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #0277bd;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .file-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .file-input-label {
+            padding: 10px 15px;
+            background-color: #0277bd;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .file-input-label:hover {
+            background-color: #0277bd;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .current-file {
+            font-style: italic;
+            color: #666;
+        }
+        
+		.stats {
+		    display: flex;
+		    flex-wrap: wrap;
+		    justify-content: space-around;
+		    gap: 20px;
+		    margin-bottom: 30px;
+		}
+
+		.stat-card {
+		    flex: 1;
+		    min-width: 200px;
+		    padding: 5px 15px 8px 15px;
+		    border-radius: 10px;
+		    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+		    display: flex;
+		    flex-direction: column;
+		}
+
+		.stat-card h3 {
+		    color: #333;
+		    margin-bottom: 5px;
+		    font-size: 14px;
+		    text-align: center;
+		    font-weight: 600;
+		}
+
+		.stat-card .stat-item {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    margin-bottom: 1px;
+		    padding-bottom: 1px;
+		    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+		}
+
+		.stat-card .stat-item:last-child {
+		    border-bottom: none;
+		    margin-bottom: 0;
+		    padding-bottom: 0;
+		}
+
+		.stat-card .stat-label {
+		    font-size: 12px;
+		    color: #666;
+		    flex: 1;
+		    line-height: 1.4;
+		}
+
+		.stat-card .stat-value {
+		    font-size: 14px;
+		    font-weight: 700;
+		    color: #333;
+		    flex: 0 0 auto;
+		    margin-left: 10px;
+		    text-align: right;
+		    min-width: 80px;
+		}
+
+		.stat-card .max-date {
+		    font-size: 12px;
+		    color: #888;
+		    text-align: center;
+		    margin-top: 8px;
+		    width: 100%;
+		    font-style: italic;
+		}
+
+		/* Цвета для разных карточек */
+		.stat-card.water {
+		    background-color: #e8f4fc;
+		    border-left: 5px solid #024b7b;
+		}
+
+		.stat-card.other-water {
+		    background-color: #f0f9f0;
+		    border-left: 5px solid #2e7d32;
+		}
+
+		.stat-card.combined {
+		    background-color: #fff8e1;
+		    border-left: 5px solid #ff8f00;
+		}
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        
+        .data-format {
+            background-color: #f8fdff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e1f5fe;
+            margin-top: 30px;
+        }
+        
+        .data-format h3 {
+            color: #0277bd;
+            margin-bottom: 10px;
+        }
+        
+        .data-format code {
+            background-color: #f1f8ff;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 18px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1f5fe;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .period-navigation {
+                order: 1;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .interval-selector {
+                order: 2;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .file-info {
+                order: 3;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .period-display {
+                min-width: 200px;
+                font-size: 14px;
+            }
+			
+			h1{
+			font-size: 18px;	
+			}
+			
+			 .container {
+				padding: 15px;  
+			 }
+			 
+			 body {
+				padding: 15px;  
+			 }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>График потребления воды</h1>
+         <div id="no-data-message" class="no-data">
+             <p>Загрузите файл с данными для построения графика</p>
+			 <p id="ios-help" style="display: none; color: #ff6b6b; margin-top: 10px;">
+         </div>
+        </header>
+        
+        
+        
+        <div class="stats" id="stats-container" style="display: none;">
+            <!-- Статистика будет заполнена скриптом -->
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="waterChart"></canvas>
+        </div>
+        
+        <div class="controls">
+            <div class="period-navigation">
+                <button class="nav-btn" id="prev-period" disabled>←</button>
+                <div class="period-display" id="period-display">...</div>
+                <button class="nav-btn" id="next-period" disabled>→</button>
+            </div>
+            
+            <div class="interval-selector">
+                <label>Интервал:</label>
+                <div>
+                    <button class="interval-btn active" data-days="7" disabled>7 дней</button>
+                    <button class="interval-btn" data-days="30" disabled>30 дней</button>
+                </div>
+            </div>
+            
+            
+        </div>
+		
+        <div class="file-upload-container">
+            <label for="data-file" class="file-input-label">📁 Загрузить файл данных</label>
+            <input type="file" id="data-file" class="file-input" accept=".txt">
+            <div class="current-file" id="current-file-name">Файл не выбран</div>
+        </div>
+		
+        
+        
+        
+        
+        <footer>
+            
+        </footer>
+    </div>
+
+    <script>
+        // Элементы DOM
+        const intervalButtons = document.querySelectorAll('.interval-btn');
+        const prevPeriodBtn = document.getElementById('prev-period');
+        const nextPeriodBtn = document.getElementById('next-period');
+        const periodDisplay = document.getElementById('period-display');
+        const chartCanvas = document.getElementById('waterChart');
+        const noDataMessage = document.getElementById('no-data-message');
+        const statsContainer = document.getElementById('stats-container');
+        const fileInput = document.getElementById('data-file');
+        const fileNameDisplay = document.getElementById('current-file-name');
+		const iosHelp = document.getElementById('ios-help');
+		// Проверяем iOS
+		const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        // Переменные для данных и графика
+        let waterData = [];
+        let groupedDailyData = [];
+        let currentDaysInterval = 7;
+        let currentStartIndex = 0; // Индекс начала текущего периода
+        let waterChart = null;
+        
+        // Обработчики кнопок интервала
+        intervalButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Убираем активный класс со всех кнопок
+                intervalButtons.forEach(btn => btn.classList.remove('active'));
+                // Добавляем активный класс на нажатую кнопку
+                this.classList.add('active');
+                // Устанавливаем новый интервал
+                currentDaysInterval = parseInt(this.getAttribute('data-days'));
+                // Сбрасываем на последний период
+                resetToLastPeriod();
+                // Обновляем график
+                updateChart();
+            });
+        });
+        
+        // Обработчики кнопок навигации
+        prevPeriodBtn.addEventListener('click', () => {
+            moveToPreviousPeriod();
+            updateChart();
+        });
+        
+        nextPeriodBtn.addEventListener('click', () => {
+            moveToNextPeriod();
+            updateChart();
+        });
+        
+        // Обработчик выбора файла
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+				fileNameDisplay.textContent = `Загружаем: ${file.name}`;
+				// Для iOS добавляем небольшую задержку
+				if (isIOS) {
+				setTimeout(() => readFile(file), 100);
+			    } else {
+				 readFile(file);
+				}
+            }
+        });
+        
+        // Чтение файла
+        function readFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+				try {
+                    const dataString = e.target.result;
+                  // Проверка на пустой файл
+                  if (!dataString || dataString.trim() === '') {
+                       throw new Error('Файл пустой');
+                  }
+                   
+                   processData(dataString);
+				                    fileNameDisplay.textContent = `Загружен: ${file.name}`;
+				                   enableControls();
+				                    
+				                    // Скрываем сообщение для iOS после успешной загрузки
+				                    iosHelp.style.display = 'none';
+				                } catch (error) {
+				                   console.error('Ошибка обработки файла:', error);
+				                   showError(`Ошибка обработки: ${error.message}`);
+				                }
+            };
+            
+            reader.onerror = function() {
+				showError('Ошибка при чтении файла');
+				                if (isIOS) {
+				                    iosHelp.style.display = 'block';
+				                }
+				            };
+				            
+				            reader.onabort = function() {
+				               showError('Чтение файла прервано');
+            };
+            
+			try {
+			                reader.readAsText(file, 'UTF-8');
+			            } catch (error) {
+			                showError(`Не удалось прочитать файл: ${error.message}`);
+			            }
+			        }
+			        
+			        // Показать ошибку
+			        function showError(message) {
+			            fileNameDisplay.textContent = message;
+			            fileNameDisplay.style.color = '#ff6b6b';
+			            
+			            // Сброс через 3 секунды
+			            setTimeout(() => {
+			                fileNameDisplay.textContent = 'Файл не выбран';
+			                fileNameDisplay.style.color = '';
+			            }, 3000);
+        }
+        
+        // Активация элементов управления
+        function enableControls() {
+            intervalButtons.forEach(btn => btn.disabled = false);
+			            prevPeriodBtn.disabled = false;
+			            nextPeriodBtn.disabled = false;
+        }
+        
+        // Сброс к последнему периоду
+        function resetToLastPeriod() {
+            if (groupedDailyData.length === 0) return;
+            // Устанавливаем начало так, чтобы показывать последние N дней
+            currentStartIndex = Math.max(0, groupedDailyData.length - currentDaysInterval);
+        }
+        
+        // Переход к предыдущему периоду (более ранние даты)
+        function moveToPreviousPeriod() {
+            if (groupedDailyData.length === 0) return;
+            // Сдвигаемся назад на текущий интервал
+            currentStartIndex = Math.max(0, currentStartIndex - currentDaysInterval);
+        }
+        
+        // Переход к следующему периоду (более поздние даты)
+        function moveToNextPeriod() {
+            if (groupedDailyData.length === 0) return;
+            // Сдвигаемся вперед на текущий интервал
+            currentStartIndex = Math.min(
+                groupedDailyData.length - currentDaysInterval, 
+                currentStartIndex + currentDaysInterval
+            );
+        }
+        
+        // Преобразование даты из формата ДД.ММ.ГГГГ в YYYY-MM-DD для корректной сортировки
+        function parseCustomDate(dateStr) {
+            const parts = dateStr.split('.');
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            return dateStr;
+        }
+        
+        // Обработка данных из файла
+        function processData(dataString) {
+		    try {
+		                  const lines = dataString.trim().split('\n');
+		                   waterData = [];
+		                   
+		                   let lineNumber = 0;
+		                   for (const line of lines) {
+		                       lineNumber++;
+		                       const trimmedLine = line.trim();
+		                       if (trimmedLine === '') continue; // Пропускаем пустые строки
+		                       
+		                       const parts = trimmedLine.split(';');
+		                       if (parts.length < 4) {
+		                           console.warn(`Строка ${lineNumber} пропущена: неверный формат`);
+		                           continue;
+		                       }
+		                       
+		                       const dateStr = parts[0].trim();
+		                       const timeStr = parts[1].trim();
+                    const water = parseInt(parts[2]) || 0;
+                    const otherWater = parseInt(parts[3]) || 0;
+                    const totalWater = water + otherWater;
+                    
+					// Проверка формата даты
+					                    if (!/^\d{2}\.\d{2}\.\d{4}$/.test(dateStr)) {
+					                        console.warn(`Строка ${lineNumber}: неверный формат даты: ${dateStr}`);
+					                        continue;
+					                    }
+                    
+                    const isoDateStr = parseCustomDate(dateStr);
+                    const dateTime = new Date(`${isoDateStr}T${timeStr}`);
+                    
+                    waterData.push({
+                        originalDate: dateStr, // сохраняем оригинальный формат даты
+                        date: isoDateStr, // используем ISO формат для сортировки
+                        time: timeStr,
+                        dateTime: dateTime,
+                        water: water,
+                        otherWater: otherWater,
+                        total: totalWater
+                    });
+                }
+			    if (waterData.length === 0) {
+			                       throw new Error('Нет корректных данных в файле');
+			                   }
+			                   
+			                   // Сортируем данные по дате
+			                   waterData.sort((a, b) => a.dateTime - b.dateTime);
+			                   
+			                   // Группируем данные по дням
+			                   groupedDailyData = groupDataByDay(waterData);
+			                   
+			                   // Сбрасываем на последний период
+			                   resetToLastPeriod();
+			                   
+			                   // Обновляем график и статистику
+			                   updateChart();
+			                   
+			               } catch (error) {
+			                   console.error('Ошибка обработки данных:', error);
+			                   throw error;
+			               }
+        }
+        
+        // Группировка данных по дням
+        function groupDataByDay(data) {
+            const grouped = {};
+            
+            data.forEach(entry => {
+                // Используем оригинальный формат даты для группировки
+                const date = entry.originalDate;
+                
+                if (!grouped[date]) {
+                    grouped[date] = {
+                        originalDate: date,
+                        date: entry.date,
+                        total: 0,
+                        water: 0,
+                        otherWater: 0,
+                        count: 0
+                    };
+                }
+                
+                grouped[date].total += entry.total;
+                grouped[date].water += entry.water;
+                grouped[date].otherWater += entry.otherWater;
+                grouped[date].count++;
+            });
+            
+            // Преобразуем объект в массив и сортируем по дате
+            return Object.values(grouped).sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+        
+        // Получение данных для текущего периода
+        function getCurrentPeriodData() {
+            if (groupedDailyData.length === 0) return [];
+            
+            // Вычисляем конечный индекс
+            const endIndex = Math.min(currentStartIndex + currentDaysInterval, groupedDailyData.length);
+            
+            // Возвращаем данные для текущего периода
+            return groupedDailyData.slice(currentStartIndex, endIndex);
+        }
+        
+        // Обновление отображаемого периода
+        function updatePeriodDisplay() {
+            if (groupedDailyData.length === 0) {
+                periodDisplay.textContent = 'Загрузите файл с данными';
+                prevPeriodBtn.disabled = true;
+                nextPeriodBtn.disabled = true;
+                return;
+            }
+            
+            const periodData = getCurrentPeriodData();
+            
+            if (periodData.length === 0) {
+                periodDisplay.textContent = 'Нет данных для периода';
+                prevPeriodBtn.disabled = true;
+                nextPeriodBtn.disabled = true;
+                return;
+            }
+            
+            // Получаем даты начала и конца периода
+            const startDate = periodData[0]?.originalDate || '';
+            const endDate = periodData[periodData.length - 1]?.originalDate || '';
+            
+            // Форматируем для отображения
+            let displayText;
+            if (startDate && endDate) {
+                const isLastPeriod = (currentStartIndex + currentDaysInterval) >= groupedDailyData.length;
+                
+                if (isLastPeriod) {
+                    displayText = `Последние ${periodData.length} дней`;
+                } else {
+                    displayText = `${startDate} - ${endDate}`;
+                }
+            } else {
+                displayText = `Период: ${periodData.length} из ${groupedDailyData.length} дней`;
+            }
+            
+            periodDisplay.textContent = displayText;
+            
+            // Управляем состоянием кнопок навигации
+            prevPeriodBtn.disabled = currentStartIndex === 0;
+            nextPeriodBtn.disabled = (currentStartIndex + currentDaysInterval) >= groupedDailyData.length;
+        }
+        
+        // Обновление графика
+        function updateChart() {
+            if (groupedDailyData.length === 0) {
+                noDataMessage.style.display = 'block';
+                chartCanvas.style.display = 'none';
+                statsContainer.style.display = 'none';
+                return;
+            }
+            
+            noDataMessage.style.display = 'none';
+            chartCanvas.style.display = 'block';
+            statsContainer.style.display = 'flex';
+            
+            // Получаем данные для текущего периода
+            const periodData = getCurrentPeriodData();
+            
+            // Обновляем отображение периода
+            updatePeriodDisplay();
+            
+            const labels = periodData.map(item => item.originalDate);
+            const waterOnly = periodData.map(item => item.water);
+            const otherWater = periodData.map(item => item.otherWater);
+            
+            // Если график уже существует, уничтожаем его
+            if (waterChart) {
+                waterChart.destroy();
+            }
+            
+            // Создаем новый график
+            const ctx = chartCanvas.getContext('2d');
+            waterChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Выпил',
+                            data: waterOnly,
+                            backgroundColor: '#44b7c2',
+                            borderColor: '#1a8791',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Вышло',
+                            data: otherWater,
+                            backgroundColor: '#ffad49',
+                            borderColor: '#db841a',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y + ' мл';
+                                    return label;
+                                },
+                                afterLabel: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        const total = waterOnly[context.dataIndex] + otherWater[context.dataIndex];
+                                        return `Всего: ${total} мл`;
+                                    }
+                                    return null;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: false,
+                                text: 'Дата',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: false,
+                                text: 'Объем (мл)',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' мл';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Обновляем статистику
+            updateStatistics();
+        }
+        
+		// Обновление статистики
+		function updateStatistics() {
+		    if (groupedDailyData.length === 0) return;
+    
+		    // Получаем данные для текущего периода
+		    const periodData = getCurrentPeriodData();
+    
+		    if (periodData.length === 0) {
+		        statsContainer.innerHTML = `
+            <div class="stat-card water">
+                <h3>Основная вода</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Всего за период</span>
+                    <span class="stat-value">0 мл</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Среднее в день</span>
+                    <span class="stat-value">0 мл</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Максимум</span>
+                    <span class="stat-value">0 мл</span>
+                </div>
+                <div class="max-date">Нет данных</div>
+            </div>
+            <div class="stat-card other-water">
+                <h3>Другая вода</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Всего за период</span>
+                    <span class="stat-value">0 мл</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Среднее в день</span>
+                    <span class="stat-value">0 мл</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Максимум</span>
+                    <span class="stat-value">0 мл</span>
+                </div>
+                <div class="max-date">Нет данных</div>
+            </div>
+		        `;
+		        return;
+		    }
+    
+		    // Расчет статистики для Основной воды
+		    const totalWater = periodData.reduce((sum, day) => sum + day.water, 0);
+		    const averageWater = Math.round(totalWater / periodData.length);
+		    const maxWaterDay = periodData.reduce((max, day) => day.water > max.water ? day : max, {water: 0, originalDate: ''});
+    
+		    // Расчет статистики для Другой воды
+		    const totalOtherWater = periodData.reduce((sum, day) => sum + day.otherWater, 0);
+		    const averageOtherWater = Math.round(totalOtherWater / periodData.length);
+		    const maxOtherWaterDay = periodData.reduce((max, day) => day.otherWater > max.otherWater ? day : max, {otherWater: 0, originalDate: ''});
+    
+		    // Расчет статистики для Общего потребления
+		    const totalCombined = periodData.reduce((sum, day) => sum + day.total, 0);
+		    const averageCombined = Math.round(totalCombined / periodData.length);
+		    const maxCombinedDay = periodData.reduce((max, day) => day.total > max.total ? day : max, {total: 0, originalDate: ''});
+    
+		    // Форматируем значения
+		    const formatML = (value) => {
+		        if (value >= 1000) {
+		            return (value / 1000).toFixed(1) + ' л';
+		        }
+		        return value + ' мл';
+		    };
+    
+		    // Создаем HTML для статистики
+		    statsContainer.innerHTML = `
+        <div class="stat-card water">
+            <h3>Основная вода</h3>
+            <div class="stat-item">
+                <span class="stat-label">Всего за период</span>
+                <span class="stat-value">${formatML(totalWater)}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Среднее в день</span>
+                <span class="stat-value">${formatML(averageWater)}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Максимум ${maxWaterDay.originalDate || 'Нет данных'}</span>
+                <span class="stat-value">${formatML(maxWaterDay.water)}</span>
+            </div>
+         
+        </div>
+        <div class="stat-card other-water">
+            <h3>Другая вода</h3>
+            <div class="stat-item">
+                <span class="stat-label">Всего за период</span>
+                <span class="stat-value">${formatML(totalOtherWater)}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Среднее в день</span>
+                <span class="stat-value">${formatML(averageOtherWater)}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Максимум ${maxOtherWaterDay.originalDate || 'Нет данных'}</span>
+                <span class="stat-value">${formatML(maxOtherWaterDay.otherWater)}</span>
+            </div>
+            
+        </div>
+		    `;
+		}
+		
+        
+        // Инициализация при загрузке страницы
+        window.addEventListener('DOMContentLoaded', function() {
+            // Все элементы изначально неактивны
+            prevPeriodBtn.disabled = true;
+            nextPeriodBtn.disabled = true;
+            intervalButtons.forEach(btn => btn.disabled = true);
+        });
+    </script>
+</body>
+</html>
