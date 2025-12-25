@@ -379,13 +379,13 @@ function updateChart() {
                             label += context.parsed.y + ' мл';
                             return label;
                         },
-                        afterLabel: function(context) {
-                            if (context.datasetIndex === 0) {
-                                const total = waterOnly[context.dataIndex] + otherWater[context.dataIndex];
-                                return `Всего: ${total} мл`;
-                            }
-                            return null;
-                        }
+                       // afterLabel: function(context) {
+                         //   if (context.datasetIndex === 0) {
+                         //       const total = waterOnly[context.dataIndex] + otherWater[context.dataIndex];
+                         //       return `Всего: ${total} мл`;
+                        //    }
+                       //     return null;
+                     //   }
                     }
                 }
             },
