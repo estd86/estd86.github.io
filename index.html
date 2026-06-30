@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generated Code</title>
+  <style>
+
+:root {
+  --bg-color: #f8f9fa;
+  --text-main: #000000;
+  --text-muted: #757575;
+  --accent-green: #1d713a;
+  --card-bg: #ffffff;
+  --border-radius: 24px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 414px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-bottom: 30px;
+}
+
+.header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.nav-left {
+  display: flex;
+  gap: 12px;
+}
+
+.back-btn, .info-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main);
+  padding: 4px;
+}
+
+.info-btn {
+  background: #e9ecef;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-titles h1 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.header-titles p {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.ticket-container {
+  padding: 0 16px;
+  flex: 1;
+}
+
+.ticket {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.ticket-qr-section {
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timestamp {
+  color: var(--accent-green);
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+.qr-wrapper {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-code {
+  width: 160px;
+  height: 160px;
+}
+
+.tennis-ball-icon {
+  position: absolute;
+  left: -40px;
+  top: 85%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ball {
+  width: 28px;
+  height: 28px;
+  background: #9ef01a;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+  animation: bounceBall 0.6s infinite alternate ease-in-out;
+}
+
+.ball::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid white;
+  border-radius: 50%;
+  left: -82%;
+  top: -10%;
+}
+
+.ball::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid white;
+  border-radius: 50%;
+  right: -82%;
+  top: 10%;
+}
+
+@keyframes bounceBall {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-30px); }
+}
+
+.shadow {
+  width: 18px;
+  height: 5px;
+  background: rgba(0,0,0,0.9);
+  border-radius: 50%;
+  margin-top: -1px;
+  animation: bounceShadow 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes bounceShadow {
+  0% { transform: scale(1); opacity: 0.15; }
+  100% { transform: scale(0.6); opacity: 0.05; }
+}
+
+.serial-number {
+  margin-top: 15px;
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.ticket-separator {
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.dash-line {
+  flex: 1;
+  border-top: 1px dashed #e0e0e0;
+  margin: 0 10px;
+}
+
+.cutout {
+  width: 20px;
+  height: 20px;
+  background: var(--bg-color);
+  border-radius: 50%;
+  position: absolute;
+}
+
+.cutout.left { left: -10px; }
+.cutout.right { right: -10px; }
+
+.ticket-details {
+  padding: 10px 24px 24px;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  margin-bottom: 18px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.8fr 1fr;
+  margin-bottom: 24px;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.value.small {
+  font-size: 14px;
+  color: #757575;
+}
+
+.horizontal-divider {
+  height: 1px;
+  background-color: #f0f0f0;
+  margin-bottom: 18px;
+}
+
+.footer-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+}
+
+.bottom-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  gap: 15px;
+}
+
+.pill-indicator {
+  width: 24px;
+  height: 4px;
+  background: var(--accent-green);
+  border-radius: 2px;
+}
+
+.home-bar {
+  width: 134px;
+  height: 5px;
+  background: #000;
+  border-radius: 100px;
+  margin-top: 5px;
+}
+
+@media (max-width: 360px) {
+  .detail-grid {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 15px;
+  }
+}
+  
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <header class="header">
+    <div class="nav-left">
+      <button class="back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      </button>
+      <div class="header-titles">
+        <h1>Day 2 - 30 June</h1>
+        <p>Ticket 1 of 1</p>
+      </div>
+    </div>
+    <div class="info-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+    </div>
+  </header>
+
+  <main class="ticket-container">
+    <div class="ticket">
+      <div class="ticket-image">
+        <img src="https://content.wimbledon.com/is/image/AELTC/Poster+2026:16by9-Large" alt="Wimbledon Stadium Illustration">
+      </div>
+      
+      <div class="ticket-qr-section">
+        <div class="timestamp" id="time">11:25:09 PM</div>
+        <div class="qr-wrapper">
+          <div class="tennis-ball-icon">
+            <div class="ball"></div>
+            <div class="shadow"></div>
+          </div>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=003684917210575092940115" alt="QR Code" class="qr-code">
+        </div>
+        <div class="serial-number">003684917210575092940115</div>
+      </div>
+
+      <div class="ticket-separator">
+        <div class="cutout left"></div>
+        <div class="dash-line"></div>
+        <div class="cutout right"></div>
+      </div>
+
+      <div class="ticket-details">
+        <div class="detail-row">
+          <div class="detail-group">
+            <span class="label">Court</span>
+            <span class="value">Centre Court</span>
+          </div>
+          <div class="detail-group">
+            <span class="label">Date</span>
+            <span class="value">Tue 30 Jun</span>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-group">
+            <span class="label">Stand</span>
+            <span class="value">Main<br>Stand</span>
+          </div>
+          <div class="detail-group">
+            <span class="label">Gangway</span>
+            <span class="value">316</span>
+          </div>
+          <div class="detail-group">
+            <span class="label">Row</span>
+            <span class="value">T</span>
+          </div>
+          <div class="detail-group">
+            <span class="label">Seat</span>
+            <span class="value">447</span>
+          </div>
+        </div>
+
+        <div class="horizontal-divider"></div>
+
+        <div class="footer-row">
+          <div class="detail-group">
+            <span class="label">Ticket holder</span>
+            <span class="value small">Alfiia Salimgareeva</span>
+          </div>
+          <div class="detail-group">
+            <span class="label">Ticket Type</span>
+            <span class="value small">AELTC Public</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bottom-nav">
+    <div class="pill-indicator"></div>
+    <div class="home-bar"></div>
+  </footer>
+</div>
+
+<script>
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('time').innerText = now.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            second: '2-digit', 
+            hour12: true 
+        });
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+</script>
+</body>
+</html>
